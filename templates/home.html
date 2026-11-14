@@ -6,9 +6,9 @@
     <h1>The right details, in the right hands, within seconds</h1>
     <p class="lead">A HealthTag QR code holds a person's blood group, allergies and emergency contact. Bystanders see only who to call. Verified doctors and paramedics see the emergency card. The full history opens only when the person's own contact says yes.</p>
     <div class="actions">
-      <a class="btn coral" href="{{ url_for('register') }}">Create a HealthTag</a>
-      <a class="btn ghost" href="{{ url_for('pro_login') }}">Doctor or paramedic sign-in</a>
+      <a class="btn coral" href="{{ url_for('owner_auth.owner_login') }}">Log in to your account</a>
     </div>
+    <p class="fine" style="margin-top:.9rem">New here? <a href="{{ url_for('register') }}"><b>Create a HealthTag</b></a></p>
   </div>
   <div class="qr-card">
     <img src="{{ url_for('qr_image', pid=demo_id) }}" alt="QR code for the demo patient">
