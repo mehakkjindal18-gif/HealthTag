@@ -67,7 +67,7 @@ OWNER_KEY_MAX_PER_IP = 10     # wrong owner keys per IP in 15 min
 FAST2SMS_API_KEY = os.environ.get("FAST2SMS_API_KEY", "")
 FAST2SMS_URL = "https://www.fast2sms.com/dev/bulkV2"
 FAST2SMS_ROUTE = os.environ.get("FAST2SMS_ROUTE", "q")   # q = Quick SMS, no DLT
-SMS_ENABLED = os.environ.get("HEALTHTAG_ENABLE_SMS", "0") == "1" and bool(FAST2SMS_API_KEY)
+SMS_ENABLED = os.environ.get("HEALTHTAG_ENABLE_SMS", "1") == "1" and bool(FAST2SMS_API_KEY)
 VAPID_PUBLIC_KEY = os.environ.get("HEALTHTAG_VAPID_PUBLIC_KEY", "").strip()
 
 BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Not sure"]
