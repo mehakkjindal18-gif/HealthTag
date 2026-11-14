@@ -15,14 +15,18 @@
       HealthTag
     </a>
     <nav>
-      <a href="{{ url_for('inbox') }}">Notifications</a>
+      {% if session.get('owner') %}
+        <a href="{{ url_for('owner_auth.my_profiles') }}">My profiles</a>
+        <a href="{{ url_for('register') }}">Create a HealthTag</a>
+        <a href="{{ url_for('owner_auth.owner_logout') }}">Log out</a>
+      {% else %}
+        <a href="{{ url_for('owner_auth.owner_login') }}">Log in</a>
+      {% endif %}
       {% if pro %}
-        <a href="{{ url_for('notifications') }}">Notifications</a>
         <span class="who">{{ pro.name }}</span>
         <a href="{{ url_for('pro_logout') }}">Sign out</a>
-      {% else %}
-        <a href="{{ url_for('pro_login') }}">Doctor or paramedic sign-in</a>
       {% endif %}
+      <a href="{{ url_for('inbox') }}">Notifications</a>
     </nav>
   </div>
 </header>
