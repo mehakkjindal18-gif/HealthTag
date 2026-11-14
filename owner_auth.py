@@ -1,6 +1,7 @@
 """Mobile-number login for HealthTag owners. Plugs into app.py without editing it."""
 import hashlib
 import hmac
+import os
 import re
 import secrets
 import sqlite3
@@ -12,8 +13,9 @@ from app import (app, db, DB_PATH, sha256_hex, hits, record_hit, clear_hits,
                  client_ip, grant_owner, owner_ok, load_profile, log_event, iso)
 
 bp = Blueprint("owner_auth", __name__)
+BOOT_ID = secrets.token_hex(8)
 
-# --- own table, created if missing (profiles table is untouched) ---
+# --- own table, created if missing (the profiles table is untouched) ---
 _conn = sqlite3.connect(DB_PATH)
 _conn.execute("""CREATE TABLE IF NOT EXISTS owner_logins (
     pid TEXT PRIMARY KEY, phone_hash TEXT NOT NULL, created_at TEXT)""")
@@ -45,6 +47,7 @@ LOGIN_PAGE = """{% extends "base.html" %}
     <p class="help">You can also paste your whole private link here.</p></div>
   <button class="btn block" type="submit">Log in</button>
 </form>
+<p class="fine">New here? <a href="{{ url_for('register') }}">Create a HealthTag</a></p>
 {% endblock %}"""
 
 LINK_PAGE = """{% extends "base.html" %}
@@ -64,6 +67,28 @@ LINK_PAGE = """{% extends "base.html" %}
     <p class="help">You will log in with this number and your private code. This is not your emergency contact's number.</p></div>
   <button class="btn coral block" type="submit">Save and continue</button>
 </form>
+{% endblock %}"""
+
+PROFILES_PAGE = """{% extends "base.html" %}
+{% block title %}My profiles{% endblock %}
+{% block content %}
+<h1>My profiles</h1>
+{% for p in profiles %}
+<section class="panel">
+  <h2 style="margin:0">{{ p.name }}</h2>
+  <p class="fine">Code: {{ p.id }}</p>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('card', pid=p.id) }}">Open card</a>
+    <a class="btn ghost" href="{{ url_for('owner', pid=p.id) }}">Dashboard</a>
+  </div>
+</section>
+{% else %}
+<p class="muted">No profiles signed in on this browser.</p>
+{% endfor %}
+<div class="actions">
+  <a class="btn ghost" href="{{ url_for('owner_auth.owner_login') }}">Log in to another profile</a>
+  <a class="btn coral" href="{{ url_for('register') }}">Create another HealthTag</a>
+</div>
 {% endblock %}"""
 
 
@@ -101,6 +126,16 @@ def owner_logout():
     return redirect(url_for("home"))
 
 
+@bp.route("/owner/profiles")
+def my_profiles():
+    profiles = []
+    for pid in list(session.get("owner", {}).keys()):
+        p = load_profile(pid)
+        if p and owner_ok(pid, p["owner_key"]):
+            profiles.append(p)
+    return render_template_string(PROFILES_PAGE, profiles=profiles)
+
+
 @bp.route("/owner/<pid>/phone", methods=["GET", "POST"])
 def link_phone(pid):
     p = load_profile(pid)
@@ -126,6 +161,7 @@ def link_phone(pid):
 def init():
     """Register the pages and send new registrations to the phone-setup step."""
     app.register_blueprint(bp)
+
     original = app.view_functions["register"]
 
     def register_then_link_phone():
@@ -136,3 +172,11 @@ def init():
         return resp
 
     app.view_functions["register"] = register_then_link_phone
+
+    # Optional: sign everyone out whenever the local server restarts
+    if os.environ.get("HEALTHTAG_LOGOUT_ON_RESTART") == "1":
+        def _fresh_start():
+            if session.get("boot") != BOOT_ID:
+                session.clear()
+                session["boot"] = BOOT_ID
+        app.before_request_funcs.setdefault(None, []).insert(0, _fresh_start)
