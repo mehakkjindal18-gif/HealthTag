@@ -75,7 +75,7 @@ HealthTag implements the following functionality:
 Potential enhancements include:
 
 - ABHA integration.
-- Additional security hardening, including CSRF protection and rate limiting.
+- Additional security hardening, including CSRF protection.
 - Further testing of security, reliability, and production readiness.
 
 HealthTag is a working prototype demonstrating controlled access to emergency medical information. It should undergo appropriate security and reliability testing before being used for real medical emergencies.
