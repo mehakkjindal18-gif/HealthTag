@@ -5,6 +5,5 @@ gunicorn>=22.0
 requests>=2.31
 qrcode[pil]>=7.4
 Pillow>=10.0
-openai
 pywebpush>=2.0.3       # sends browser push notifications using VAPID
 flask-wtf>=1.2
