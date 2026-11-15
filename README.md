@@ -15,6 +15,8 @@ HealthTag is a QR-based emergency health identity system that provides controlle
 - **Owner dashboard:** Review access activity and notifications.
 - **Printable HealthTag:** Create a HealthTag and generate its printable card.
 - **Cloud deployment:** Hosted on Render and accessible over the internet, including QR scanning across different networks.
+- **CRSF Protection:** Additional security hardening, including CSRF protection.
+
 
 ## Emergency Access Levels
 
@@ -75,7 +77,6 @@ HealthTag implements the following functionality:
 Potential enhancements include:
 
 - ABHA integration.
-- Additional security hardening, including CSRF protection.
 - Further testing of security, reliability, and production readiness.
 
 HealthTag is a working prototype demonstrating controlled access to emergency medical information. It should undergo appropriate security and reliability testing before being used for real medical emergencies.
